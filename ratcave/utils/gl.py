@@ -1,5 +1,6 @@
 import pyglet.gl as gl
-from ctypes import byref
+from pyglet.compat import asstr
+from ctypes import byref, cast, c_char_p
 from collections import namedtuple
 
 
@@ -48,3 +49,13 @@ def get_viewport():
 def clear_color(r, g, b):
     gl.glClearColor(r, g, b, 1.)
     gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
+
+
+
+def get_opengl_version():
+    Version = namedtuple('Version', 'major minor vendor driver')
+
+    full_version, vendor, driver = asstr(cast(gl.glGetString(gl.GL_VERSION), c_char_p).value).split(' ')
+    major, minor, _ = full_version.split('.')
+    version = Version(major=int(major), minor=int(minor), vendor=vendor, driver=driver)
+    return version

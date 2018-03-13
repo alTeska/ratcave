@@ -1,5 +1,5 @@
-#version 150
-#extension GL_NV_shadow_samplers_cube : enable
+#version 120
+
 
 uniform int flat_shading, TextureMap_isBound, CubeMap_isBound, DepthMap_isBound;
 uniform float spec_weight, opacity;
@@ -14,10 +14,11 @@ in vec2 texCoord;
 in vec3 normal, eyeVec;
 in vec4 vVertex, ShadowCoord;
 
-out vec4 final_color;
 
 void main()
 {
+
+    vec4 final_color = vec4(0., 0., 0., 0.);
 
     //If lighting is turned off, just use the diffuse color and return. (Flat lighting)
     if (flat_shading > 0) {
@@ -64,22 +65,22 @@ void main()
         specular_coeff = pow(cosAngle, spec_weight);
     }
 
-    // Depth-Map Shadows
+//    // Depth-Map Shadows
     float shadow_coeff = 1.;
-    if (DepthMap_isBound > 0){
-        if (ShadowCoord.w > 0.0){
-            vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w;
-            shadowCoordinateWdivide.z -= .0001; // to prevent "shadow acne" caused from precision errors
-            float distanceFromLight = texture(DepthMap, shadowCoordinateWdivide.xyz);
-            shadow_coeff = 0.65 + (0.35 * distanceFromLight);
-        }
-    }
+//    if (DepthMap_isBound > 0){
+//        if (ShadowCoord.w > 0.0){
+//            vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w;
+//            shadowCoordinateWdivide.z -= .0001; // to prevent "shadow acne" caused from precision errors
+//            float distanceFromLight = texture(DepthMap, shadowCoordinateWdivide.xyz);
+//            shadow_coeff = 0.65 + (0.35 * distanceFromLight);
+//        }
+//    }
 
     // Calculate Final Color and Opacity
     vec3 color = shadow_coeff * texture_coeff *
                  (1.5 * (specular_coeff * specular) +
                  (diffuse_coeff * diffuse) +
                  (ambient_coeff * ambient));
-    final_color = vec4(clamp(color, 0, 1), 1.0);
+    gl_FragColor = vec4(clamp(color, 0, 1), 1.0);
 
  }

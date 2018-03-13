@@ -9,10 +9,10 @@ uniform sampler2D TextureMap;
 uniform sampler2DShadow DepthMap;
 uniform samplerCube CubeMap;
 
-in float lightAmount;
-in vec2 texCoord;
-in vec3 normal, eyeVec;
-in vec4 vVertex, ShadowCoord;
+varying float lightAmount;
+varying vec2 texCoord;
+varying vec3 normal, eyeVec;
+varying vec4 vVertex, ShadowCoord;
 
 
 void main()
@@ -38,6 +38,7 @@ void main()
     if (CubeMap_isBound > 0){
             final_color = textureCube(CubeMap, eyeVec);// * lightAmount;
             final_color[3] = 1.0;
+            gl_FragColor = final_color;
             return;
     }
 

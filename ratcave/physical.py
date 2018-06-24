@@ -200,6 +200,13 @@ class PhysicalGraph(Physical, SceneGraph):
         for child in self.children:
             child.notify()
 
+    def set_parent(self, parent, modify=False):
+        """ Adds an object as a child in the scene graph. With modify=True, model_matrix_transform gets change from identity and prevents the changes of the coordinates of the child"""
+        SceneGraph.set_parent(self, parent)
+        if modify:
+            # self.notify()
+            self._model_matrix_transform[:] = trans.inverse_matrix(parent.model_matrix_global)
+            self._normal_matrix_transform[:] = trans.inverse_matrix(parent.normal_matrix_global)
 
     def add_child(self, child, modify=False):
         """ Adds an object as a child in the scene graph. With modify=True, model_matrix_transform gets change from identity and prevents the changes of the coordinates of the child"""

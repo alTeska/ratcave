@@ -28,7 +28,6 @@ class SceneGraph(object):
 
     @property
     def parent(self):
-        # TODO: change to set_parent
         """A SceneNode object that is this object's parent in the scene graph."""
         return self._parent
 
@@ -40,13 +39,18 @@ class SceneGraph(object):
         self._parent = value
         self._parent._children.append(self)
 
+    def set_parent(self, value):
+        """Convenience function: Adds parent object to a child in the scene graph."""
+        assert isinstance(value, SceneGraph)
+        if self._parent is not None:
+            self._parent._children.remove(self)
+        self._parent = value
+        self._parent._children.append(self)
+
     def add_child(self, child):
         """Adds an object as a child in the scene graph."""
         if not issubclass(child.__class__, SceneGraph):
             raise TypeError("child must have parent/child iteration implemented to be a node in a SceneGraph.")
-        # if not hasattr(child, 'update'):
-            # raise TypeError("child must have an attribute update()")
-
         child._parent = self
         self._children.append(child)
 

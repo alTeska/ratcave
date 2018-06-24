@@ -223,6 +223,7 @@ class Scale(Coordinates):
             mat[:3, :3] = matrix
             matrix = mat
 
+        # PROBLEM: SVD returns values in descending order, not depending on the previous location
         _, s, _ = np.linalg.svd(matrix[:3, :3], full_matrices=True)
         coords = np.flip(s, axis=0)
         return cls(*coords)

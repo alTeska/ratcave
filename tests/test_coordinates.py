@@ -1,6 +1,7 @@
 from __future__ import print_function
 import unittest
 import numpy as np
+from numpy.random import randn, randint
 
 from ratcave import coordinates, Physical
 
@@ -36,27 +37,42 @@ class TestCoordinates(unittest.TestCase):
         self.assertTrue(pos.y == pos_fm.y)
         self.assertTrue(pos.z == pos_fm.z)
 
-
     def test_scale(self): # TODO
         S = coordinates.Scale(1)
 
     def test_scale_from_matrix(self):
-        phys = Physical(position=(1,1,1), rotation=(1,1,1))
-        scale = 1, 2, 3.2
-        phys.scale = scale
-        scale_fm = coordinates.Scale.from_matrix(phys.model_matrix)
 
-        scale_fm_matrix = scale_fm.to_matrix()
-        scale_matrix = np.diag((scale[0], scale[1], scale[2], 1.))
-        self.assertTrue(np.isclose(scale_matrix, scale_fm_matrix).all())
-
-        for scale in (5, 6, 7):
-            phys = Physical()
-            phys.scale = scale
+        for scale in abs(randn(10)) * randint(1, high=100, size=10):
+            phys = Physical(scale=scale)
             scale_fm = coordinates.Scale.from_matrix(phys.model_matrix)
-            scale_fm_matrix = scale_fm.to_matrix()
-            scale_matrix = np.diag((scale, scale, scale, 1.))
-            self.assertTrue(np.isclose(scale_matrix, scale_fm_matrix).all())
+
+            self.assertTrue(np.isclose(scale_fm.x, scale))
+            self.assertTrue(np.isclose(scale_fm.y, scale))
+            self.assertTrue(np.isclose(scale_fm.z, scale))
+
+            phys = Physical(scale=scale, rotation=(1., 2., 3.))
+            scale_fm = coordinates.Scale.from_matrix(phys.model_matrix)
+
+            self.assertTrue(np.isclose(scale_fm.x, scale))
+            self.assertTrue(np.isclose(scale_fm.y, scale))
+            self.assertTrue(np.isclose(scale_fm.z, scale))
+
+            # phys = Physical(scale=scale, rotation=(1., 2., 3.))
+        # scale = abs(randn(3)) * randint(1, high=100)
+
+    def test_scale_from_matrix_multi(self):
+        for _ in range(1):
+            scale = abs(randint(1, high=100, size=3))
+            phys = Physical()
+            phys.scale.x = scale[0]
+            phys.scale.y = scale[1]
+            phys.scale.z = scale[2]
+            scale_fm = coordinates.Scale.from_matrix(phys.model_matrix)
+
+            self.assertTrue(np.isclose(scale_fm.x, scale[0]))
+            self.assertTrue(np.isclose(scale_fm.y, scale[1]))
+            self.assertTrue(np.isclose(scale_fm.z, scale[2]))
+
 
     # TODO:
     # def test_rotation(self):

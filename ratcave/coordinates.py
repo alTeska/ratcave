@@ -196,6 +196,15 @@ class Translation(Coordinates):
     def to_matrix(self):
         return trans.translation_matrix(self._array)
 
+    @classmethod
+    def from_matrix(cls, matrix):
+        if matrix.shape[0] == 3:
+            mat = np.identity(4)
+            mat[:3, :3] = matrix
+            matrix = mat
+        coords = matrix[:-1, 3]
+        return cls(*coords)
+
 
 class Scale(Coordinates):
 
@@ -207,6 +216,16 @@ class Scale(Coordinates):
     def to_matrix(self):
         return np.diag((self._array[0], self._array[1], self._array[2], 1.))
 
+    @classmethod
+    def from_matrix(cls, matrix):
+        if matrix.shape[0] == 3:
+            mat = np.identity(4)
+            mat[:3, :3] = matrix
+            matrix = mat
+
+        _, s, _ = np.linalg.svd(matrix[:3, :3], full_matrices=True)
+        coords = np.flip(s, axis=0)
+        return cls(*coords)
 
 
 def cross_product_matrix(vec):
